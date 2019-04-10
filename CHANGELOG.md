@@ -2,17 +2,22 @@
 ## [Unreleased]
 
 
+<a name="v3.4.0"></a>
+## [v3.4.0] - 2019-04-10
+### Chore
+- **release:** new version
+
+### Fix
+- **CI:** error
+- **sample:** json
+
+
 <a name="v3.2.4"></a>
 ## [v3.2.4] - 2019-04-10
 ### Chore
 - **CI:** script
-- **release:** new version
-
-
-<a name="v3.2.2"></a>
-## [v3.2.2] - 2019-04-10
-### Chore
 - **doc:** update
+- **release:** new version
 - **release:** new version
 - **release:** new version
 
@@ -102,9 +107,9 @@
 <a name="v1.0.0"></a>
 ## v1.0.0 - 2015-03-21
 
-[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.2.4...HEAD
-[v3.2.4]: https://github.com/Soontao/cachet-monitor/compare/v3.2.2...v3.2.4
-[v3.2.2]: https://github.com/Soontao/cachet-monitor/compare/v3.1.4...v3.2.2
+[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.4.0...HEAD
+[v3.4.0]: https://github.com/Soontao/cachet-monitor/compare/v3.2.4...v3.4.0
+[v3.2.4]: https://github.com/Soontao/cachet-monitor/compare/v3.1.4...v3.2.4
 [v3.1.4]: https://github.com/Soontao/cachet-monitor/compare/v3.1.3...v3.1.4
 [v3.1.3]: https://github.com/Soontao/cachet-monitor/compare/v3.1.2...v3.1.3
 [v3.1.2]: https://github.com/Soontao/cachet-monitor/compare/v0.1.0...v3.1.2
