@@ -3,8 +3,9 @@
 # cli file naem
 OUTPUT_FILENAME="cachetmonitor"
 
-PLATFORMS="darwin/amd64" # amd64 only as of go1.5
-PLATFORMS="$PLATFORMS windows/amd64 windows/386" # arm compilation not available for Windows
+PLATFORMS="darwin/amd64"
+# disable windows build
+# PLATFORMS="$PLATFORMS windows/amd64 windows/386"
 PLATFORMS="$PLATFORMS linux/amd64 linux/386"
 PLATFORMS_ARM="linux"
 
