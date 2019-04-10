@@ -3,6 +3,8 @@ package cachet
 import (
 	"net"
 	"time"
+
+	"github.com/Sirupsen/logrus"
 )
 
 // TCPMonitor struct
@@ -12,23 +14,28 @@ type TCPMonitor struct {
 }
 
 // CheckTCPPortAlive func
-func CheckTCPPortAlive(ip, port string, timeout int64) bool {
+func CheckTCPPortAlive(ip, port string, timeout int64) (bool, error) {
 
 	conn, err := net.DialTimeout("tcp", net.JoinHostPort(ip, port), time.Duration(timeout)*time.Second)
 	if conn != nil {
 		defer conn.Close()
 	}
 	if err != nil {
-		return false
+		return false, err
 	} else {
-		return true
+		return true, nil
 	}
 
 }
 
 // test if it available
 func (m *TCPMonitor) test() bool {
-	return CheckTCPPortAlive(m.Target, m.Port, int64(m.Timeout))
+	if alive, e := CheckTCPPortAlive(m.Target, m.Port, int64(m.Timeout)); alive {
+		return true
+	} else {
+		logrus.Errorf("TCP check failed: %v", e)
+		return false
+	}
 }
 
 // Validate configuration
