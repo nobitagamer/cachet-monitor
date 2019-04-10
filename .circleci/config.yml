@@ -1,0 +1,91 @@
+version: 2
+jobs:
+
+  test:
+    docker:
+      - image: circleci/golang:1.12
+
+    working_directory: /go/src/github.com/Soontao/cachet-monitor
+    steps:
+      - checkout
+      - run: go get -v -t -d ./...
+      - run: go test -v ./...
+      - run: go build .
+
+  build:
+    docker:
+      - image: circleci/golang:1.12
+
+    working_directory: /go/src/github.com/Soontao/cachet-monitor
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/artifacts
+      - run: 
+          name: install golang deps
+          command: go get -v -t -d ./...
+      - run: 
+          name: unit tests
+          command: go test -v ./...
+      - run: 
+          name: build multi platform excutable file
+          command: cd ./cli && VERSION=${CIRCLE_TAG} bash ./build.sh
+      - persist_to_workspace:
+          root: ./cli
+          paths: ./build
+
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ~/artifacts
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=${CIRCLE_TAG}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ~/artifacts/build/
+
+  publish-docker-image:
+    working_directory: /go/src/github.com/Soontao/cachet-monitor
+    docker:
+      - image: docker:18.06.3-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+      - run: docker build -t theosun/cachet-monitor:${CIRCLE_TAG} .
+      - run: docker tag theosun/cachet-monitor:${CIRCLE_TAG} theosun/cachet-monitor:latest
+      - run: docker push theosun/cachet-monitor:${CIRCLE_TAG}
+      - run: docker push theosun/cachet-monitor:latest    
+      
+workflows:
+  version: 2
+  main:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              ignore: /.*/
+      - build:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
+      - publish-github-release:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
+      - publish-docker-image:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
