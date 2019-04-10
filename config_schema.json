@@ -116,7 +116,12 @@
           }
         }
       },
-      "required": [],
+      "required": [
+        "name",
+        "component_id",
+        "target",
+        "type"
+      ],
       "title": "Monitor"
     },
     "Answer": {

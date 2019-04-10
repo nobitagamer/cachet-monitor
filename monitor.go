@@ -7,12 +7,12 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-// unit is second
-const DefaultInterval = 30
-const DefaultTimeout = 3
-const DefaultTimeFormat = "15:04:05 Jan 2 MST"
-const DefaultThreshold = 3
+// Unit is SECOND
 
+const DefaultInterval = 15
+const DefaultTimeout = 10
+const DefaultTimeFormat = time.RFC3339
+const DefaultThreshold = 3
 const HistorySize = 3
 
 type MonitorInterface interface {
@@ -148,6 +148,7 @@ func (mon *AbstractMonitor) ClockStop() {
 func (mon *AbstractMonitor) test() bool { return false }
 
 func (mon *AbstractMonitor) tick(iface MonitorInterface) {
+
 	reqStart := getMs()
 	up := iface.test()
 	lag := getMs() - reqStart
@@ -158,11 +159,13 @@ func (mon *AbstractMonitor) tick(iface MonitorInterface) {
 	}
 
 	if len(mon.history) == histSize-1 {
-		logrus.Warnf("%v is now saturated", mon.Name)
+		logrus.Infof("%v is now saturated", mon.Name)
 	}
+
 	if len(mon.history) >= histSize {
 		mon.history = mon.history[len(mon.history)-(histSize-1):]
 	}
+
 	mon.history = append(mon.history, up)
 	mon.AnalyseData()
 

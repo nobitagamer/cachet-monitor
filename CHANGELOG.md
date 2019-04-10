@@ -12,10 +12,12 @@
 - **CI:** code coverage
 
 ### Feat
+
 - **CI:** support
 - **TCP:** TCP port checks
 
 ### Pull Requests
+
 - Merge pull request [#66](https://github.com/Soontao/cachet-monitor/issues/66) from CastawayLabs/feature/upstart-example
 - Merge pull request [#99](https://github.com/Soontao/cachet-monitor/issues/99) from osallou/fix_set_version
 - Merge pull request [#92](https://github.com/Soontao/cachet-monitor/issues/92) from srabouin/master

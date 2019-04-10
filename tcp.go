@@ -1,6 +1,7 @@
 package cachet
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -51,7 +52,9 @@ func (m *TCPMonitor) test() bool {
 	if alive, e := CheckTCPPortAlive(m.Target, m.Port, int64(m.Timeout)); alive {
 		return true
 	} else {
-		logrus.Errorf("TCP check failed: %v", e)
+		msg := fmt.Sprintf("TCP check failed: %v", e)
+		logrus.Error(msg)
+		m.lastFailReason = msg
 		return false
 	}
 }

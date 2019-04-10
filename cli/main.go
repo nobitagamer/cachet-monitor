@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -11,57 +12,77 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/urfave/cli"
+
 	"github.com/Sirupsen/logrus"
 	cachet "github.com/Soontao/cachet-monitor"
-	docopt "github.com/docopt/docopt-go"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
 )
 
-const usage = `cachet-monitor
+// Version string, in release version
+// This variable will be overwrite by complier
+var Version = "SNAPSHOT"
 
-Usage:
-  cachet-monitor (-c PATH | --config PATH) [--log=LOGPATH] [--name=NAME] [--immediate]
-  cachet-monitor -h | --help | --version
+// AppName of this application
+var AppName = "Cachet Monitor"
 
-Arguments:
-  PATH     path to config.json
-  LOGPATH  path to log output (defaults to STDOUT)
-  NAME     name of this logger
-
-Examples:
-  cachet-monitor -c /root/cachet-monitor.json
-  cachet-monitor -c /root/cachet-monitor.json --log=/var/log/cachet-monitor.log --name="development machine"
-
-Options:
-  -c PATH.json --config PATH     Path to configuration file
-  -h --help                      Show this screen.
-  --version                      Show version
-  --immediate                    Tick immediately (by default waits for first defined interval)
-  
-Environment varaibles:
-  CACHET_API      override API url from configuration
-  CACHET_TOKEN    override API token from configuration
-  CACHET_DEV      set to enable dev logging`
-
-var version string
+// AppUsage of this application
+var AppUsage = "A Command Line Tool for Cachet Monitor"
 
 func main() {
-	arguments, _ := docopt.Parse(usage, nil, true, version, false)
 
-	cfg, err := getConfiguration(arguments["--config"].(string))
+	app := cli.NewApp()
+
+	app.Version = Version
+	app.Name = AppName
+	app.Usage = AppUsage
+	app.EnableBashCompletion = true
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:   "config,c",
+			EnvVar: "CONFIG_FILE",
+			Value:  "./config.json",
+			Usage:  "Path to configuration file",
+		},
+		cli.StringFlag{
+			Name:   "log,l",
+			EnvVar: "LOG_FILE",
+			Usage:  "Path to log file",
+		},
+		cli.StringFlag{
+			Name:   "name,n",
+			EnvVar: "SYSTEM_NAME",
+			Usage:  "System name",
+		},
+	}
+
+	app.Action = appAction
+
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func appAction(c *cli.Context) (err error) {
+
+	configPath := c.GlobalString("config")
+	systemName := c.GlobalString("name")
+	logFile := c.GlobalString("log")
+
+	cfg, err := getConfiguration(configPath)
 	if err != nil {
 		logrus.Panicf("Unable to start (reading config): %v", err)
 	}
 
-	if immediate, ok := arguments["--immediate"]; ok {
-		cfg.Immediate = immediate.(bool)
+	cfg.Immediate = true
+
+	if systemName != "" {
+		cfg.SystemName = systemName
 	}
 
-	if name := arguments["--name"]; name != nil {
-		cfg.SystemName = name.(string)
-	}
-	logrus.SetOutput(getLogger(arguments["--log"]))
+	logrus.SetOutput(getLogger(logFile))
 
 	if len(os.Getenv("CACHET_API")) > 0 {
 		cfg.API.URL = os.Getenv("CACHET_API")
@@ -84,13 +105,16 @@ func main() {
 	logrus.Infof("Monitors: %d\n", len(cfg.Monitors))
 
 	logrus.Infof("Pinging cachet")
+
 	if err := cfg.API.Ping(); err != nil {
 		logrus.Errorf("Cannot ping cachet!\n%v", err)
 		os.Exit(1)
 	}
+
 	logrus.Infof("Ping OK")
 
 	wg := &sync.WaitGroup{}
+
 	for index, monitor := range cfg.Monitors {
 		logrus.Infof("Starting Monitor #%d: ", index)
 		logrus.Infof("Features: \n - %v", strings.Join(monitor.Describe(), "\n - "))
@@ -103,11 +127,14 @@ func main() {
 	<-signals
 
 	logrus.Warnf("Abort: Waiting monitors to finish")
+
 	for _, mon := range cfg.Monitors {
 		mon.GetMonitor().ClockStop()
 	}
 
 	wg.Wait()
+
+	return err
 }
 
 func getLogger(logPath interface{}) *os.File {
