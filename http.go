@@ -2,6 +2,7 @@ package cachet
 
 import (
 	"crypto/tls"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -83,7 +84,11 @@ func (monitor *HTTPMonitor) test() bool {
 		}
 
 		if !monitor.bodyRegexp.Match(responseBody) {
-			monitor.lastFailReason = "Unexpected body: " + string(responseBody) + ".\nExpected to match: " + monitor.ExpectedBody
+			monitor.lastFailReason = fmt.Sprintf(
+				"Unexpected body: %v.\nExpected to match: %v",
+				string(responseBody),
+				monitor.ExpectedBody,
+			)
 			return false
 		}
 	}
@@ -93,6 +98,7 @@ func (monitor *HTTPMonitor) test() bool {
 
 // Validate configuration
 func (mon *HTTPMonitor) Validate() []string {
+
 	mon.Template.Investigating.SetDefault(defaultHTTPInvestigatingTpl)
 	mon.Template.Fixed.SetDefault(defaultHTTPFixedTpl)
 

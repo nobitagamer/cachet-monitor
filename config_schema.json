@@ -63,7 +63,16 @@
           "type": "boolean"
         },
         "method": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "OPTIONS",
+            "HEAD"
+          ]
         },
         "component_id": {
           "type": "integer"
