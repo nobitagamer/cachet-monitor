@@ -1,0 +1,9 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && apt-get install -y zip
+
+COPY ./artifacts/cachetmonitor-linux-amd64.zip .
+
+RUN unzip ./cachetmonitor-linux-amd64.zip
+
+CMD ["./cachetmonitor-linux-amd64"]

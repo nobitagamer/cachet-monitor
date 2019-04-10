@@ -4,3 +4,5 @@ examples/
 coverage*
 cli/cli
 cli/*.json
+cli/build
+artifacts

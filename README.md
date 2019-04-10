@@ -24,7 +24,7 @@
 
 **Not** support windows platform.
 
-1. Download binary from [release page](https://github.com/Soontao/cachet-monitor/releases)
+1. [Download binary](https://github.com/Soontao/cachet-monitor/releases)
 2. Add the binary to an executable path (/usr/bin, etc.)
 3. Create a configuration following provided examples
 4. `cachet-monitor -c /etc/cachet-monitor.yaml`
