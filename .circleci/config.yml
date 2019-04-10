@@ -68,8 +68,6 @@ workflows:
             tags:
               ignore: /.*/
       - build:
-          requires:
-            - test
           filters:
             branches:
               ignore: /.*/
