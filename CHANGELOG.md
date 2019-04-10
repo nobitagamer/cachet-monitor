@@ -1,6 +1,13 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Chore
+- **little:** change
+- **release:** new version
+
+### Fix
+- **CI:** script
+
 
 <a name="v3.1.2"></a>
 ## [v3.1.2] - 2019-04-10
