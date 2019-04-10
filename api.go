@@ -55,7 +55,6 @@ func (api CachetAPI) SendMetric(id int, lag int64) {
 	defer resp.Body.Close()
 }
 
-// TODO: test
 // NewRequest wraps http.NewRequest
 func (api CachetAPI) NewRequest(requestType, url string, reqBody []byte) (*http.Response, CachetResponse, error) {
 	req, err := http.NewRequest(requestType, api.URL+url, bytes.NewBuffer(reqBody))

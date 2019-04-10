@@ -3,3 +3,4 @@
 examples/
 coverage*
 cli/cli
+cli/*.json

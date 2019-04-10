@@ -101,7 +101,7 @@
           ]
         },
         "port": {
-          "type": "integer"
+          "type": "string"
         },
         "question": {
           "type": "string"

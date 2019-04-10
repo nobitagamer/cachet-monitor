@@ -14,11 +14,26 @@ type Incident struct {
 	Name    string `json:"name"`
 	Message string `json:"message"`
 	Status  int    `json:"status"`
-	Visible int    `json"visible"`
+	Visible int    `json:"visible"`
 	Notify  bool   `json:"notify"`
 
 	ComponentID     int `json:"component_id"`
 	ComponentStatus int `json:"component_status"`
+}
+
+type IncidentResponse struct {
+	ID          int64       `json:"id"`
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Link        string      `json:"link"`
+	Status      int64       `json:"status"`
+	Order       int64       `json:"order"`
+	GroupID     int64       `json:"group_id"`
+	CreatedAt   string      `json:"created_at"`
+	UpdatedAt   string      `json:"updated_at"`
+	DeletedAt   interface{} `json:"deleted_at"`
+	Enabled     bool        `json:"enabled"`
+	StatusName  string      `json:"status_name"`
 }
 
 // Send - Create or Update incident
@@ -56,14 +71,13 @@ func (incident *Incident) Send(cfg *CachetMonitor) error {
 		return err
 	}
 
-	var data struct {
-		ID int `json:"id"`
-	}
-	if err := json.Unmarshal(body.Data, &data); err != nil {
+	var respIncident = IncidentResponse{}
+
+	if err := json.Unmarshal(body.Data, &respIncident); err != nil {
 		return fmt.Errorf("Cannot parse incident body: %v, %v", err, string(body.Data))
 	}
 
-	incident.ID = data.ID
+	incident.ID = int(respIncident.ID)
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("Could not create/update incident!")
 	}
@@ -81,14 +95,13 @@ func (incident *Incident) GetComponentStatus(cfg *CachetMonitor) (int, error) {
 		return 0, fmt.Errorf("Invalid status code. Received %d", resp.StatusCode)
 	}
 
-	var data struct {
-		Status int `json:"status,string"`
-	}
+	data := IncidentResponse{}
+
 	if err := json.Unmarshal(body.Data, &data); err != nil {
 		return 0, fmt.Errorf("Cannot parse component body: %v. Err = %v", string(body.Data), err)
 	}
 
-	return data.Status, nil
+	return int(data.Status), nil
 }
 
 // SetInvestigating sets status to Investigating

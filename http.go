@@ -40,14 +40,16 @@ type HTTPMonitor struct {
 	bodyRegexp   *regexp.Regexp
 }
 
-// TODO: test
 func (monitor *HTTPMonitor) test() bool {
+
 	req, err := http.NewRequest(monitor.Method, monitor.Target, nil)
+
 	for k, v := range monitor.Headers {
 		req.Header.Add(k, v)
 	}
 
 	transport := http.DefaultTransport.(*http.Transport)
+
 	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: monitor.Strict == false}
 	client := &http.Client{
 		Timeout:   time.Duration(monitor.Timeout * time.Second),
@@ -62,11 +64,16 @@ func (monitor *HTTPMonitor) test() bool {
 
 	defer resp.Body.Close()
 
+	// status check
 	if monitor.ExpectedStatusCode > 0 && resp.StatusCode != monitor.ExpectedStatusCode {
 		monitor.lastFailReason = "Expected HTTP response status: " + strconv.Itoa(monitor.ExpectedStatusCode) + ", got: " + strconv.Itoa(resp.StatusCode)
 		return false
+	} else if resp.StatusCode > 499 {
+		// server internal error also failed
+		return false
 	}
 
+	// body check
 	if monitor.bodyRegexp != nil {
 		// check response body
 		responseBody, err := ioutil.ReadAll(resp.Body)
@@ -84,7 +91,7 @@ func (monitor *HTTPMonitor) test() bool {
 	return true
 }
 
-// TODO: test
+// Validate configuration
 func (mon *HTTPMonitor) Validate() []string {
 	mon.Template.Investigating.SetDefault(defaultHTTPInvestigatingTpl)
 	mon.Template.Fixed.SetDefault(defaultHTTPFixedTpl)

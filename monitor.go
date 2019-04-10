@@ -7,10 +7,11 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-const DefaultInterval = time.Second * 60
-const DefaultTimeout = time.Second
+// unit is second
+const DefaultInterval = 30
+const DefaultTimeout = 3
 const DefaultTimeFormat = "15:04:05 Jan 2 MST"
-const HistorySize = 10
+const HistorySize = 100
 
 type MonitorInterface interface {
 	ClockStart(*CachetMonitor, MonitorInterface, *sync.WaitGroup)
@@ -85,7 +86,7 @@ func (mon *AbstractMonitor) Validate() []string {
 	}
 
 	if mon.Threshold <= 0 {
-		mon.Threshold = 100
+		mon.Threshold = 3
 	}
 
 	if err := mon.Template.Fixed.Compile(); err != nil {
@@ -121,6 +122,7 @@ func (mon *AbstractMonitor) ClockStart(cfg *CachetMonitor, iface MonitorInterfac
 	}
 
 	ticker := time.NewTicker(mon.Interval * time.Second)
+
 	for {
 		select {
 		case <-ticker.C:
@@ -168,7 +170,6 @@ func (mon *AbstractMonitor) tick(iface MonitorInterface) {
 	}
 }
 
-// TODO: test
 // AnalyseData decides if the monitor is statistically up or down and creates / resolves an incident
 func (mon *AbstractMonitor) AnalyseData() {
 	// look at the past few incidents
@@ -184,6 +185,7 @@ func (mon *AbstractMonitor) AnalyseData() {
 		"monitor": mon.Name,
 		"time":    time.Now().Format(mon.config.DateFormat),
 	})
+
 	if numDown == 0 {
 		l.Printf("monitor is up")
 	} else if mon.ThresholdCount {
@@ -245,6 +247,7 @@ func (mon *AbstractMonitor) AnalyseData() {
 	mon.incident.Name = subject
 	mon.incident.Message = message
 	mon.incident.SetFixed()
+
 	if err := mon.incident.Send(mon.config); err != nil {
 		l.Printf("Error sending incident: %v", err)
 	}
