@@ -107,10 +107,6 @@ func (mon *HTTPMonitor) Validate() []string {
 		}
 	}
 
-	if len(mon.ExpectedBody) == 0 && mon.ExpectedStatusCode == 0 {
-		errs = append(errs, "Both 'expected_body' and 'expected_status_code' fields empty")
-	}
-
 	mon.Method = strings.ToUpper(mon.Method)
 	switch mon.Method {
 	case "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD":
