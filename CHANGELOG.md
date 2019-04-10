@@ -1,8 +1,12 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+
+<a name="v3.1.3"></a>
+## [v3.1.3] - 2019-04-10
 ### Chore
 - **little:** change
+- **release:** new version
 - **release:** new version
 
 ### Fix
@@ -76,7 +80,8 @@
 <a name="v1.0.0"></a>
 ## v1.0.0 - 2015-03-21
 
-[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.1.2...HEAD
+[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.1.3...HEAD
+[v3.1.3]: https://github.com/Soontao/cachet-monitor/compare/v3.1.2...v3.1.3
 [v3.1.2]: https://github.com/Soontao/cachet-monitor/compare/v0.1.0...v3.1.2
 [v0.1.0]: https://github.com/Soontao/cachet-monitor/compare/v3.0...v0.1.0
 [v3.0]: https://github.com/Soontao/cachet-monitor/compare/v3-alpha-1...v3.0
