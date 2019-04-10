@@ -1,4 +1,5 @@
 {
+  "$schema": "./config_schema.json",
   "api": {
     "url": "https://demo.cachethq.io/api/v1",
     "token": "9yMHsdioQosnyVK4iCVR",
@@ -30,6 +31,13 @@
       },
       "expected_status_code": 200,
       "expected_body": "P.*NG"
+    },
+    {
+      "name": "SS - Hong Kong",
+      "target": "hk01.fornever.org",
+      "type": "tcp",
+      "port": 8443,
+      "component_id": 3
     },
     {
       "name": "dns",

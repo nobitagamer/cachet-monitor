@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$ref": "#/definitions/CachetMonitorConfig",
+  "definitions": {
+    "CachetMonitorConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$schema": {
+          "type": "string"
+        },
+        "api": {
+          "$ref": "#/definitions/API"
+        },
+        "date_format": {
+          "type": "string"
+        },
+        "monitors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Monitor"
+          }
+        }
+      },
+      "required": [],
+      "title": "CachetMonitorConfig"
+    },
+    "API": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "qt-uri-protocols": [
+            "https"
+          ]
+        },
+        "token": {
+          "type": "string"
+        },
+        "insecure": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "title": "API"
+    },
+    "Monitor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string",
+          "qt-uri-protocols": [
+            "https"
+          ]
+        },
+        "strict": {
+          "type": "boolean"
+        },
+        "method": {
+          "type": "string"
+        },
+        "component_id": {
+          "type": "integer"
+        },
+        "metric_id": {
+          "type": "integer"
+        },
+        "template": {
+          "$ref": "#/definitions/Template"
+        },
+        "interval": {
+          "type": "integer"
+        },
+        "timeout": {
+          "type": "integer"
+        },
+        "threshold": {
+          "type": "integer"
+        },
+        "headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "expected_status_code": {
+          "type": "integer"
+        },
+        "expected_body": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "tcp",
+            "http",
+            "dns"
+          ]
+        },
+        "port": {
+          "type": "integer"
+        },
+        "question": {
+          "type": "string"
+        },
+        "dns": {
+          "type": "string"
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Answer"
+          }
+        }
+      },
+      "required": [],
+      "title": "Monitor"
+    },
+    "Answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "regex": {
+          "type": "string"
+        },
+        "exact": {
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "Answer"
+    },
+    "Headers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Authorization": {
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "Headers"
+    },
+    "Template": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "investigating": {
+          "$ref": "#/definitions/Investigating"
+        },
+        "fixed": {
+          "$ref": "#/definitions/Fixed"
+        }
+      },
+      "required": [],
+      "title": "Template"
+    },
+    "Fixed": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "Fixed"
+    },
+    "Investigating": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [],
+      "title": "Investigating"
+    }
+  }
+}

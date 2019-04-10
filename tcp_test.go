@@ -3,11 +3,15 @@ package cachet
 import "testing"
 
 func TestCheckTCPPortAlive(t *testing.T) {
+
+	timeoutSecond := int64(5)
+
 	type args struct {
 		host    string
 		port    string
 		timeout int64
 	}
+
 	tests := []struct {
 		name string
 		args args
@@ -18,16 +22,34 @@ func TestCheckTCPPortAlive(t *testing.T) {
 			args{
 				"114.114.114.114",
 				"53",
-				60,
+				timeoutSecond,
 			},
 			true,
 		},
 		{
-			"test unknown host/port (it should failed)",
+			"test port with hostname",
+			args{
+				"baidu.com",
+				"443",
+				timeoutSecond,
+			},
+			true,
+		},
+		{
+			"test not work port with ip (it should failed)",
 			args{
 				"220.167.78.233",
 				"600001",
-				5,
+				timeoutSecond,
+			},
+			false,
+		},
+		{
+			"test not work port with hostname (it should failed)",
+			args{
+				"baidu.com",
+				"444",
+				timeoutSecond,
 			},
 			false,
 		},

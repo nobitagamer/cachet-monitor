@@ -14,80 +14,11 @@
 - [x] Can be run on multiple servers and geo regions
 - [x] **NEW** TCP Checks
 - [ ] **NEW** SAP Cloud Application Status Checks
-- [ ] **NEW** Configuration schema file
+- [x] **NEW** Configuration schema file
 
 ## Example Configuration
 
-**Note:** configuration can be in json or yaml format. [`example.config.json`](https://github.com/CastawayLabs/cachet-monitor/blob/master/example.config.json), [`example.config.yaml`](https://github.com/CastawayLabs/cachet-monitor/blob/master/example.config.yml) files.
-
-```yaml
-api:
-  # cachet url
-  url: https://demo.cachethq.io/api/v1
-  # cachet api token
-  token: 9yMHsdioQosnyVK4iCVR
-  insecure: false
-# https://golang.org/src/time/format.go#L57
-date_format: 02/01/2006 15:04:05 MST
-monitors:
-  # http monitor example
-  - name: google
-    # test url
-    target: https://google.com
-    # strict certificate checking for https
-    strict: true
-    # HTTP method
-    method: POST
-    
-    # set to update component (either component_id or metric_id are required)
-    component_id: 1
-    # set to post lag to cachet metric (graph)
-    metric_id: 4
-
-    # custom templates (see readme for details)
-    # leave empty for defaults
-    template:
-      investigating:
-        subject: "{{ .Monitor.Name }} - {{ .SystemName }}"
-        message: "{{ .Monitor.Name }} check **failed** (server time: {{ .now }})\n\n{{ .FailReason }}"
-      fixed:
-        subject: "I HAVE BEEN FIXED"
-    
-    # seconds between checks
-    interval: 1
-    # seconds for timeout
-    timeout: 1
-    # If % of downtime is over this threshold, open an incident
-    threshold: 80
-
-    # custom HTTP headers
-    headers:
-      Authorization: Basic <hash>
-    # expected status code (either status code or body must be supplied)
-    expected_status_code: 200
-    # regex to match body
-    expected_body: "P.*NG"
-  # dns monitor example
-  - name: dns
-    # fqdn
-    target: matej.me.
-    # question type (A/AAAA/CNAME/...)
-    question: mx
-    type: dns
-    # set component_id/metric_id
-    component_id: 2
-    # poll every 1s
-    interval: 1
-    timeout: 1
-    # custom DNS server (defaults to system)
-    dns: 8.8.4.4:53
-    answers:
-      # exact/regex check
-      - regex: [1-9] alt[1-9].aspmx.l.google.com.
-      - exact: 10 aspmx2.googlemail.com.
-      - exact: 1 aspmx.l.google.com.
-      - exact: 10 aspmx3.googlemail.com.
-```
+**Note:** configuration can be in json or yaml format. [`example.config.json`](./example.config.json), [`example.config.yaml`](./example.config.yml) files.
 
 ## Installation
 
@@ -167,4 +98,4 @@ This gives us power to have an army of geographically distributed loggers and re
 
 When using `cachet-monitor` as a package in another program, you should follow what `cli/main.go` does. It is important to call `Validate` on `CachetMonitor` and all the monitors inside.
 
-[API Documentation](https://godoc.org/github.com/CastawayLabs/cachet-monitor)
+[API Documentation](https://godoc.org/github.com/Soontao/cachet-monitor)
