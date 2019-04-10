@@ -3,10 +3,6 @@
 [![CircleCI](https://circleci.com/gh/Soontao/cachet-monitor.svg?style=shield)](https://circleci.com/gh/Soontao/cachet-monitor)
 [![codecov](https://codecov.io/gh/Soontao/cachet-monitor/branch/master/graph/badge.svg)](https://codecov.io/gh/Soontao/cachet-monitor)
 
-## screenshot
-
-![screenshot](https://castawaylabs.github.io/cachet-monitor/screenshot.png)
-
 ## Features
 
 - [x] Creates & Resolves Incidents
@@ -18,6 +14,7 @@
 - [x] Can be run on multiple servers and geo regions
 - [ ] **NEW** TCP Checks
 - [ ] **NEW** SAP Cloud Application Status Checks
+- [ ] **NEW** Configuration schema file
 
 ## Example Configuration
 
@@ -171,12 +168,3 @@ This gives us power to have an army of geographically distributed loggers and re
 When using `cachet-monitor` as a package in another program, you should follow what `cli/main.go` does. It is important to call `Validate` on `CachetMonitor` and all the monitors inside.
 
 [API Documentation](https://godoc.org/github.com/CastawayLabs/cachet-monitor)
-
-# Contributions welcome
-
-We'll happily accept contributions for the following (non exhaustive list).
-
-- Implement ICMP check
-- Implement TCP check
-- Any bug fixes / code improvements
-- Test cases
