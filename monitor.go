@@ -97,9 +97,11 @@ func (mon *AbstractMonitor) Validate() []string {
 
 	return errs
 }
+
 func (mon *AbstractMonitor) GetMonitor() *AbstractMonitor {
 	return mon
 }
+
 func (mon *AbstractMonitor) Describe() []string {
 	features := []string{"Type: " + mon.Type}
 

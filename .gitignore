@@ -2,3 +2,4 @@
 /config.json
 examples/
 coverage*
+cli/cli

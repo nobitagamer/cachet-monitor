@@ -12,7 +12,7 @@
 - [x] Updates Component to Partial Outage
 - [x] Updates Component to Major Outage if already in Partial Outage (works with distributed monitors)
 - [x] Can be run on multiple servers and geo regions
-- [ ] **NEW** TCP Checks
+- [x] **NEW** TCP Checks
 - [ ] **NEW** SAP Cloud Application Status Checks
 - [ ] **NEW** Configuration schema file
 

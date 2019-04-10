@@ -71,11 +71,8 @@ func getMs() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
 }
 
+// GetMonitorType string
 func GetMonitorType(t string) string {
-	if len(t) == 0 {
-		return "http"
-	}
-
 	return strings.ToLower(t)
 }
 
