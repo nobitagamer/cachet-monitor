@@ -2,6 +2,19 @@
 ## [Unreleased]
 
 
+<a name="v3.1.1"></a>
+## [v3.1.1] - 2019-04-10
+### Chore
+- **default:** DefaultThreshold support
+- **refactor:** cli & default value
+- **release:** new version
+- **test:** internal test passed
+
+### Feat
+- **config:** simplify http monitor configuration
+- **schema:** support
+
+
 <a name="v0.1.0"></a>
 ## [v0.1.0] - 2019-04-10
 ### Chore
@@ -12,12 +25,10 @@
 - **CI:** code coverage
 
 ### Feat
-
 - **CI:** support
 - **TCP:** TCP port checks
 
 ### Pull Requests
-
 - Merge pull request [#66](https://github.com/Soontao/cachet-monitor/issues/66) from CastawayLabs/feature/upstart-example
 - Merge pull request [#99](https://github.com/Soontao/cachet-monitor/issues/99) from osallou/fix_set_version
 - Merge pull request [#92](https://github.com/Soontao/cachet-monitor/issues/92) from srabouin/master
@@ -57,7 +68,8 @@
 <a name="v1.0.0"></a>
 ## v1.0.0 - 2015-03-21
 
-[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.1.1...HEAD
+[v3.1.1]: https://github.com/Soontao/cachet-monitor/compare/v0.1.0...v3.1.1
 [v0.1.0]: https://github.com/Soontao/cachet-monitor/compare/v3.0...v0.1.0
 [v3.0]: https://github.com/Soontao/cachet-monitor/compare/v3-alpha-1...v3.0
 [v3-alpha-1]: https://github.com/Soontao/cachet-monitor/compare/v2.0...v3-alpha-1
