@@ -11,7 +11,9 @@ import (
 const DefaultInterval = 30
 const DefaultTimeout = 3
 const DefaultTimeFormat = "15:04:05 Jan 2 MST"
-const HistorySize = 100
+const DefaultThreshold = 3
+
+const HistorySize = 3
 
 type MonitorInterface interface {
 	ClockStart(*CachetMonitor, MonitorInterface, *sync.WaitGroup)
@@ -86,7 +88,7 @@ func (mon *AbstractMonitor) Validate() []string {
 	}
 
 	if mon.Threshold <= 0 {
-		mon.Threshold = 3
+		mon.Threshold = DefaultThreshold
 	}
 
 	if err := mon.Template.Fixed.Compile(); err != nil {
