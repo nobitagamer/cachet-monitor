@@ -1,5 +1,8 @@
 # (Forked) Cachet Monitor
 
+[![CircleCI](https://circleci.com/gh/Soontao/cachet-monitor.svg?style=shield)](https://circleci.com/gh/Soontao/cachet-monitor)
+[![codecov](https://codecov.io/gh/Soontao/cachet-monitor/branch/master/graph/badge.svg)](https://codecov.io/gh/Soontao/cachet-monitor)
+
 ## screenshot
 
 ![screenshot](https://castawaylabs.github.io/cachet-monitor/screenshot.png)
