@@ -2,6 +2,8 @@
 
 [![CircleCI](https://circleci.com/gh/Soontao/cachet-monitor.svg?style=shield)](https://circleci.com/gh/Soontao/cachet-monitor)
 [![codecov](https://codecov.io/gh/Soontao/cachet-monitor/branch/master/graph/badge.svg)](https://codecov.io/gh/Soontao/cachet-monitor)
+![GitHub](https://img.shields.io/github/license/Soontao/cachet-monitor.svg)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/Soontao/cachet-monitor.svg)
 
 ## Features
 
