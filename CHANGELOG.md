@@ -2,11 +2,12 @@
 ## [Unreleased]
 
 
-<a name="v3.1.1"></a>
-## [v3.1.1] - 2019-04-10
+<a name="v3.1.2"></a>
+## [v3.1.2] - 2019-04-10
 ### Chore
 - **default:** DefaultThreshold support
 - **refactor:** cli & default value
+- **release:** new version
 - **release:** new version
 - **test:** internal test passed
 
@@ -68,8 +69,8 @@
 <a name="v1.0.0"></a>
 ## v1.0.0 - 2015-03-21
 
-[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.1.1...HEAD
-[v3.1.1]: https://github.com/Soontao/cachet-monitor/compare/v0.1.0...v3.1.1
+[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.1.2...HEAD
+[v3.1.2]: https://github.com/Soontao/cachet-monitor/compare/v0.1.0...v3.1.2
 [v0.1.0]: https://github.com/Soontao/cachet-monitor/compare/v3.0...v0.1.0
 [v3.0]: https://github.com/Soontao/cachet-monitor/compare/v3-alpha-1...v3.0
 [v3-alpha-1]: https://github.com/Soontao/cachet-monitor/compare/v2.0...v3-alpha-1
