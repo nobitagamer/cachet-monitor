@@ -28,6 +28,8 @@ jobs:
       - run: 
           name: build multi platform excutable file
           command: cd ./cli && VERSION=${CIRCLE_TAG} bash ./build.sh
+      # files will be store to artifacts/build
+      # KEEP path
       - persist_to_workspace:
           root: ./cli
           paths: ./build
@@ -36,6 +38,7 @@ jobs:
     docker:
       - image: cibuilds/github:0.10
     steps:
+      # binaries at ~/artifacts/build
       - attach_workspace:
           at: ~/artifacts
       - run:
@@ -50,6 +53,7 @@ jobs:
       - image: docker:18.06.3-ce-git
     steps:
       - checkout
+      # binaries at ~/artifacts/build
       - attach_workspace:
           at: ~/artifacts
       - setup_remote_docker
