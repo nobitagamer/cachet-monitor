@@ -38,9 +38,9 @@ jobs:
     docker:
       - image: cibuilds/github:0.10
     steps:
-      # binaries at ./artifacts/build
+      # binaries at ~/artifacts/build
       - attach_workspace:
-          at: ./artifacts
+          at: ~/artifacts
       - run:
           name: "Publish Release on GitHub"
           command: |
@@ -53,9 +53,9 @@ jobs:
       - image: docker:18.06.3-ce-git
     steps:
       - checkout
-      # binaries at ~/artifacts/build
+      # binaries at ./artifacts/build
       - attach_workspace:
-          at: ~/artifacts
+          at: ./artifacts
       - setup_remote_docker
       - run: docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
       - run: docker build -t theosun/cachet-monitor:${CIRCLE_TAG} -f ./Dockerfile.CI .
