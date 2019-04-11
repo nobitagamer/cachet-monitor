@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -81,4 +82,24 @@ func (api CachetAPI) NewRequest(requestType, url string, reqBody []byte) (*http.
 	defer req.Body.Close()
 
 	return res, body, err
+}
+
+// GetComponentStatus
+func (api CachetAPI) GetComponentStatus(componentID int) (int, error) {
+	resp, body, err := api.NewRequest("GET", "/components/"+strconv.Itoa(componentID), nil)
+	if err != nil {
+		return 0, err
+	}
+
+	if resp.StatusCode != 200 {
+		return 0, fmt.Errorf("Invalid status code. Received %d", resp.StatusCode)
+	}
+
+	data := IncidentResponse{}
+
+	if err := json.Unmarshal(body.Data, &data); err != nil {
+		return 0, fmt.Errorf("Cannot parse component body: %v. Err = %v", string(body.Data), err)
+	}
+
+	return int(data.Status), nil
 }

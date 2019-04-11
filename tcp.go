@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net"
 	"time"
-
-	"github.com/Sirupsen/logrus"
 )
 
 // Investigating template
@@ -52,9 +50,7 @@ func (m *TCPMonitor) test() bool {
 	if alive, e := CheckTCPPortAlive(m.Target, m.Port, int64(m.Timeout)); alive {
 		return true
 	} else {
-		msg := fmt.Sprintf("TCP check failed: %v", e)
-		logrus.Error(msg)
-		m.lastFailReason = msg
+		m.lastFailReason = fmt.Sprintf("TCP check failed: %v", e)
 		return false
 	}
 }

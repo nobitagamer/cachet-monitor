@@ -17,6 +17,8 @@
 - [x] **NEW** TCP Checks
 - [ ] **NEW** SAP Cloud Application Status Checks
 - [x] **NEW** Configuration schema file
+- [x] **REFACTOR** cli
+- [x] **REFACTOR** threshold removed
 
 ## Example Configuration
 

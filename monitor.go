@@ -65,6 +65,14 @@ type AbstractMonitor struct {
 	stopC chan bool
 }
 
+// SetDefaultIncident for monitor
+func (m *AbstractMonitor) SetDefaultIncident(i *Incident) {
+	if m.incident == nil {
+		m.incident = i
+	}
+}
+
+// Validate configuration
 func (mon *AbstractMonitor) Validate() []string {
 	errs := []string{}
 
@@ -94,6 +102,7 @@ func (mon *AbstractMonitor) Validate() []string {
 	if err := mon.Template.Fixed.Compile(); err != nil {
 		errs = append(errs, "Could not compile \"fixed\" template: "+err.Error())
 	}
+
 	if err := mon.Template.Investigating.Compile(); err != nil {
 		errs = append(errs, "Could not compile \"investigating\" template: "+err.Error())
 	}
@@ -150,113 +159,131 @@ func (mon *AbstractMonitor) test() bool { return false }
 func (mon *AbstractMonitor) tick(iface MonitorInterface) {
 
 	reqStart := getMs()
-	up := iface.test()
+	up := iface.test() // do check
 	lag := getMs() - reqStart
 
-	histSize := HistorySize
-	if mon.ThresholdCount {
-		histSize = int(mon.Threshold)
-	}
+	historyMaxSize := HistorySize
 
-	if len(mon.history) == histSize-1 {
-		logrus.Infof("%v is now saturated", mon.Name)
-	}
+	currentHistorySize := len(mon.history)
 
-	if len(mon.history) >= histSize {
-		mon.history = mon.history[len(mon.history)-(histSize-1):]
+	// remove first history if history queue will be full
+	if currentHistorySize == historyMaxSize {
+		mon.history = mon.history[1:]
+	} else if currentHistorySize > historyMaxSize {
+		// why will happened ?
+		mon.history = mon.history[currentHistorySize-(historyMaxSize-1):]
 	}
 
 	mon.history = append(mon.history, up)
+
 	mon.AnalyseData()
 
 	// report lag
 	if mon.MetricID > 0 {
 		go mon.config.API.SendMetric(mon.MetricID, lag)
 	}
+
 }
 
 // AnalyseData decides if the monitor is statistically up or down and creates / resolves an incident
 func (mon *AbstractMonitor) AnalyseData() {
+
 	// look at the past few incidents
 	numDown := 0
-	for _, wasUp := range mon.history {
-		if wasUp == false {
+
+	for _, up := range mon.history {
+		if up == false {
 			numDown++
 		}
 	}
 
-	t := (float32(numDown) / float32(len(mon.history))) * 100
+	// the end of history
+	currentIsUp := mon.history[len(mon.history)-1]
+
 	l := logrus.WithFields(logrus.Fields{
 		"monitor": mon.Name,
 		"time":    time.Now().Format(mon.config.DateFormat),
 	})
 
-	if numDown == 0 {
+	if currentIsUp {
 		l.Printf("monitor is up")
-	} else if mon.ThresholdCount {
-		l.Printf("monitor down %d/%d", numDown, int(mon.Threshold))
 	} else {
-		l.Printf("monitor down %.2f%%/%.2f%%", t, mon.Threshold)
+		l.Printf("monitor down %d/%d", numDown, HistorySize)
 	}
 
-	histSize := HistorySize
-	if mon.ThresholdCount {
-		histSize = int(mon.Threshold)
-	}
+	historyMaxSize := HistorySize
 
-	if len(mon.history) != histSize {
-		// not saturated
+	// wait for stable
+	if len(mon.history) != historyMaxSize {
 		return
 	}
 
-	triggered := (mon.ThresholdCount && numDown == int(mon.Threshold)) || (!mon.ThresholdCount && t > mon.Threshold)
-
-	if triggered && mon.incident == nil {
+	if !currentIsUp {
 		// create incident
 		tplData := getTemplateData(mon)
 		tplData["FailReason"] = mon.lastFailReason
 
 		subject, message := mon.Template.Investigating.Exec(tplData)
-		mon.incident = &Incident{
-			Name:        subject,
-			ComponentID: mon.ComponentID,
-			Message:     message,
-			Notify:      true,
+
+		if mon.incident == nil {
+			mon.incident = &Incident{
+				Name:        subject,
+				ComponentID: mon.ComponentID,
+				Message:     message,
+				Notify:      true,
+			}
+			// is down, create an incident
+			l.Infof("creating incident. Monitor is down: %v", mon.lastFailReason)
+		} else {
+
+			mon.incident.Message = message
 		}
 
-		// is down, create an incident
-		l.Warnf("creating incident. Monitor is down: %v", mon.lastFailReason)
 		// set investigating status
 		mon.incident.SetInvestigating()
 		// create/update incident
-		if err := mon.incident.Send(mon.config); err != nil {
+		if err, updatedStatus := mon.incident.Send(mon.config); err != nil {
 			l.Printf("Error sending incident: %v", err)
+		} else {
+			// clean history
+			mon.history = []bool{}
+			// operational
+			if updatedStatus == 4 {
+				mon.incident = nil
+				l.Infoln("Service fullly down.")
+			} else {
+				l.Infoln("Service availability downgrade.")
+			}
 		}
 
 		return
+	} else if mon.incident != nil && currentIsUp {
+		// was down, an incident existed
+		// its now ok, make it resolved
+
+		// resolve incident
+		tplData := getTemplateData(mon)
+		tplData["incident"] = mon.incident
+
+		subject, message := mon.Template.Fixed.Exec(tplData)
+		mon.incident.Name = subject
+		mon.incident.Message = message
+		mon.incident.SetFixed()
+
+		if err, updatedStatus := mon.incident.Send(mon.config); err != nil {
+			l.Printf("Error sending incident: %v", err)
+		} else {
+			// clean history
+			mon.history = []bool{}
+			mon.lastFailReason = ""
+			// operational
+			if updatedStatus == 1 {
+				mon.incident = nil
+				l.Infoln("Service stable running.")
+			} else {
+				l.Infoln("Service availability upgrade.")
+			}
+		}
 	}
 
-	// still triggered or no incident
-	if triggered || mon.incident == nil {
-		return
-	}
-
-	// was down, created an incident, its now ok, make it resolved.
-	l.Warn("Resolving incident")
-
-	// resolve incident
-	tplData := getTemplateData(mon)
-	tplData["incident"] = mon.incident
-
-	subject, message := mon.Template.Fixed.Exec(tplData)
-	mon.incident.Name = subject
-	mon.incident.Message = message
-	mon.incident.SetFixed()
-
-	if err := mon.incident.Send(mon.config); err != nil {
-		l.Printf("Error sending incident: %v", err)
-	}
-
-	mon.lastFailReason = ""
-	mon.incident = nil
 }

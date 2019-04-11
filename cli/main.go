@@ -187,12 +187,13 @@ func getConfiguration(path string) (*cachet.CachetMonitor, error) {
 	}
 
 	cfg.Monitors = make([]cachet.MonitorInterface, len(cfg.RawMonitors))
+
 	for index, rawMonitor := range cfg.RawMonitors {
 		var t cachet.MonitorInterface
 		var err error
 
-		// get default type
-		monType := cachet.GetMonitorType("")
+		monType := "unknown"
+
 		if t, ok := rawMonitor["type"].(string); ok {
 			monType = cachet.GetMonitorType(t)
 		}
@@ -215,7 +216,25 @@ func getConfiguration(path string) (*cachet.CachetMonitor, error) {
 			continue
 		}
 
+		// >> config default incident
+		defaultIncident := &cachet.Incident{
+			Name:        t.GetMonitor().Name,
+			ComponentID: t.GetMonitor().ComponentID,
+			Notify:      true,
+		}
+
+		componentStatus, err := cfg.API.GetComponentStatus(defaultIncident.ComponentID)
+
+		defaultIncident.ComponentStatus = componentStatus
+
+		// not operational
+		if defaultIncident.ComponentStatus > 1 {
+			logrus.Infof("%v start with incident.", t.GetMonitor().Name)
+			t.GetMonitor().SetDefaultIncident(defaultIncident)
+		}
+
 		t.GetMonitor().Type = monType
+		// << config default incident
 
 		if err != nil {
 			logrus.Errorf("Unable to unmarshal monitor to type (index: %d): %v", index, err)

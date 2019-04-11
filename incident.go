@@ -21,6 +21,7 @@ type Incident struct {
 	ComponentStatus int `json:"component_status"`
 }
 
+// IncidentResponse struct
 type IncidentResponse struct {
 	ID          int64       `json:"id"`
 	Name        string      `json:"name"`
@@ -37,28 +38,64 @@ type IncidentResponse struct {
 }
 
 // Send - Create or Update incident
-func (incident *Incident) Send(cfg *CachetMonitor) error {
+func (incident *Incident) Send(cfg *CachetMonitor) (err error, updatedComponentStatus int) {
+
+	// incidenet status is different server component status
+	currentServerStatus, err := incident.GetComponentStatus(cfg)
+
+	if err != nil {
+		logrus.Warnf("cannot fetch component: %v", err)
+	}
+
+	// update status
 	switch incident.Status {
 	case 1, 2, 3:
-		// partial outage
-		incident.ComponentStatus = 3
 
-		componentStatus, err := incident.GetComponentStatus(cfg)
-		if componentStatus == 3 {
-			// major outage
+		switch currentServerStatus {
+		case 1:
+			// change to perfomance issue
+			incident.ComponentStatus = 2
+		case 2:
+			// change to partial outage
+			incident.ComponentStatus = 3
+		case 3:
+			// change to major outage
 			incident.ComponentStatus = 4
+		case 4:
+			// not change
+			return nil, 0
+		default:
+			// not change
+			return nil, 0
 		}
 
-		if err != nil {
-			logrus.Warnf("cannot fetch component: %v", err)
-		}
+	// incident fixed
 	case 4:
-		// fixed
-		incident.ComponentStatus = 1
+
+		switch currentServerStatus {
+		case 1:
+			// not change
+			return nil, 0
+		case 2:
+			// change to fixed
+			incident.ComponentStatus = 1
+		case 3:
+			// change to perfomance issue
+			incident.ComponentStatus = 2
+		case 4:
+			// change to partial outage
+			incident.ComponentStatus = 3
+		default:
+			// not change
+			return nil, 0
+		}
+
 	}
 
 	requestType := "POST"
 	requestURL := "/incidents"
+
+	// if incident have ID, update it.
 	if incident.ID > 0 {
 		requestType = "PUT"
 		requestURL += "/" + strconv.Itoa(incident.ID)
@@ -68,21 +105,22 @@ func (incident *Incident) Send(cfg *CachetMonitor) error {
 
 	resp, body, err := cfg.API.NewRequest(requestType, requestURL, jsonBytes)
 	if err != nil {
-		return err
+		return err, 0
 	}
 
 	var respIncident = IncidentResponse{}
 
 	if err := json.Unmarshal(body.Data, &respIncident); err != nil {
-		return fmt.Errorf("Cannot parse incident body: %v, %v", err, string(body.Data))
+		return fmt.Errorf("Cannot parse incident body: %v, %v", err, string(body.Data)), 0
 	}
 
 	incident.ID = int(respIncident.ID)
+
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Could not create/update incident!")
+		return fmt.Errorf("Could not create/update incident!"), 0
 	}
 
-	return nil
+	return nil, incident.ComponentStatus
 }
 
 func (incident *Incident) GetComponentStatus(cfg *CachetMonitor) (int, error) {
@@ -110,11 +148,13 @@ func (incident *Incident) SetInvestigating() {
 }
 
 // SetIdentified sets status to Identified
+// not used now
 func (incident *Incident) SetIdentified() {
 	incident.Status = 2
 }
 
 // SetWatching sets status to Watching
+// not used now
 func (incident *Incident) SetWatching() {
 	incident.Status = 3
 }
