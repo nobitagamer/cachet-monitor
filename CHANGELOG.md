@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="v3.4.2"></a>
+## [v3.4.2] - 2019-04-11
+### Chore
+- **release:** new version
+
+### Fix
+- **docker:** refix
+
+
 <a name="v3.4.1"></a>
 ## [v3.4.1] - 2019-04-11
 ### Chore
@@ -116,7 +125,8 @@
 <a name="v1.0.0"></a>
 ## v1.0.0 - 2015-03-21
 
-[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.4.1...HEAD
+[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.4.2...HEAD
+[v3.4.2]: https://github.com/Soontao/cachet-monitor/compare/v3.4.1...v3.4.2
 [v3.4.1]: https://github.com/Soontao/cachet-monitor/compare/v3.4.0...v3.4.1
 [v3.4.0]: https://github.com/Soontao/cachet-monitor/compare/v3.2.4...v3.4.0
 [v3.2.4]: https://github.com/Soontao/cachet-monitor/compare/v3.1.4...v3.2.4
