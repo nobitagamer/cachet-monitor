@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 RUN apt-get update && apt-get install -y zip
 
 # ref circle ci config artifacts path
-COPY ~/artifacts/build/cachetmonitor-linux-amd64.zip .
+COPY ./artifacts/build/cachetmonitor-linux-amd64.zip .
 
 RUN unzip ./cachetmonitor-linux-amd64.zip
 
