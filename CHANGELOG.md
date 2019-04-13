@@ -1,6 +1,10 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Chore
+- **logic:** change
+- **release:** new version
+
 
 <a name="v3.5.0"></a>
 ## [v3.5.0] - 2019-04-11
