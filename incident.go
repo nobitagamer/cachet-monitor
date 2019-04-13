@@ -95,26 +95,12 @@ func (incident *Incident) Send(cfg *CachetMonitor) (err error, updatedComponentS
 	requestType := "POST"
 	requestURL := "/incidents"
 
-	// if incident have ID, update it.
-	if incident.ID > 0 {
-		requestType = "PUT"
-		requestURL += "/" + strconv.Itoa(incident.ID)
-	}
-
 	jsonBytes, _ := json.Marshal(incident)
 
-	resp, body, err := cfg.API.NewRequest(requestType, requestURL, jsonBytes)
+	resp, _, err := cfg.API.NewRequest(requestType, requestURL, jsonBytes)
 	if err != nil {
 		return err, 0
 	}
-
-	var respIncident = IncidentResponse{}
-
-	if err := json.Unmarshal(body.Data, &respIncident); err != nil {
-		return fmt.Errorf("Cannot parse incident body: %v, %v", err, string(body.Data)), 0
-	}
-
-	incident.ID = int(respIncident.ID)
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("Could not create/update incident!"), 0
