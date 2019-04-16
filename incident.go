@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 )
@@ -19,6 +20,8 @@ type Incident struct {
 
 	ComponentID     int `json:"component_id"`
 	ComponentStatus int `json:"component_status"`
+
+	incidentTime time.Time
 }
 
 // IncidentResponse struct
@@ -53,11 +56,11 @@ func (incident *Incident) Send(cfg *CachetMonitor) (err error, updatedComponentS
 
 		switch currentServerStatus {
 		case 1:
-			// change to perfomance issue
-			incident.ComponentStatus = 2
+			// change to major outage
+			incident.ComponentStatus = 4
 		case 2:
-			// change to partial outage
-			incident.ComponentStatus = 3
+			// change to major outage
+			incident.ComponentStatus = 4
 		case 3:
 			// change to major outage
 			incident.ComponentStatus = 4
@@ -80,11 +83,11 @@ func (incident *Incident) Send(cfg *CachetMonitor) (err error, updatedComponentS
 			// change to fixed
 			incident.ComponentStatus = 1
 		case 3:
-			// change to perfomance issue
-			incident.ComponentStatus = 2
+			// change to fixed
+			incident.ComponentStatus = 1
 		case 4:
-			// change to partial outage
-			incident.ComponentStatus = 3
+			// change to fixed
+			incident.ComponentStatus = 1
 		default:
 			// not change
 			return nil, 0

@@ -24,9 +24,7 @@ var defaultHTTPFixedTpl = MessageTemplate{
 	Subject: `{{ .Monitor.Name }} - {{ .SystemName }}`,
 	Message: `**Resolved** - {{ .now }}
 
-- - -
-
-{{ .incident.Message }}`,
+Down seconds: {{ .downSeconds }}s`,
 }
 
 type HTTPMonitor struct {

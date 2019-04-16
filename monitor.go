@@ -227,10 +227,11 @@ func (mon *AbstractMonitor) AnalyseData() {
 
 		if mon.incident == nil {
 			mon.incident = &Incident{
-				Name:        subject,
-				ComponentID: mon.ComponentID,
-				Message:     message,
-				Notify:      true,
+				Name:         subject,
+				ComponentID:  mon.ComponentID,
+				Message:      message,
+				Notify:       true,
+				incidentTime: time.Now(),
 			}
 			// is down, create an incident
 			l.Infof("creating incident. Monitor is down: %v", mon.lastFailReason)
@@ -263,7 +264,7 @@ func (mon *AbstractMonitor) AnalyseData() {
 
 		// resolve incident
 		tplData := getTemplateData(mon)
-		tplData["incident"] = mon.incident
+		tplData["downSeconds"] = time.Since(mon.incident.incidentTime).Seconds()
 
 		subject, message := mon.Template.Fixed.Exec(tplData)
 		mon.incident.Name = subject
