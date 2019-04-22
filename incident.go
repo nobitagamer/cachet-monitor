@@ -80,13 +80,11 @@ func (incident *Incident) Send(cfg *CachetMonitor) (err error, updatedComponentS
 			// not change
 			return nil, 0
 		case 2:
-			// change to fixed
+			// change to component alive
 			incident.ComponentStatus = 1
 		case 3:
-			// change to fixed
 			incident.ComponentStatus = 1
 		case 4:
-			// change to fixed
 			incident.ComponentStatus = 1
 		default:
 			// not change
@@ -98,20 +96,34 @@ func (incident *Incident) Send(cfg *CachetMonitor) (err error, updatedComponentS
 	requestType := "POST"
 	requestURL := "/incidents"
 
+	if incident.ID > 0 {
+		requestType = "PUT"
+		requestURL += "/" + strconv.Itoa(incident.ID)
+	}
+
 	jsonBytes, _ := json.Marshal(incident)
 
-	resp, _, err := cfg.API.NewRequest(requestType, requestURL, jsonBytes)
+	resp, body, err := cfg.API.NewRequest(requestType, requestURL, jsonBytes)
 	if err != nil {
 		return err, 0
 	}
 
+	var respIncident = &IncidentResponse{}
+
+	if err := json.Unmarshal(body.Data, respIncident); err != nil {
+		return fmt.Errorf("Cannot parse incident body: %v, %v", err, string(body.Data)), 0
+	}
+
+	incident.ID = int(respIncident.ID)
+
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Could not create/update incident!"), 0
+		return fmt.Errorf("Could not create/update incident"), 0
 	}
 
 	return nil, incident.ComponentStatus
 }
 
+// GetComponentStatus func
 func (incident *Incident) GetComponentStatus(cfg *CachetMonitor) (int, error) {
 	resp, body, err := cfg.API.NewRequest("GET", "/components/"+strconv.Itoa(incident.ComponentID), nil)
 	if err != nil {
@@ -119,7 +131,7 @@ func (incident *Incident) GetComponentStatus(cfg *CachetMonitor) (int, error) {
 	}
 
 	if resp.StatusCode != 200 {
-		return 0, fmt.Errorf("Invalid status code. Received %d", resp.StatusCode)
+		return 0, fmt.Errorf("Invalid status code. Received %d, not found the component with id: %v", resp.StatusCode, incident.ComponentID)
 	}
 
 	data := IncidentResponse{}

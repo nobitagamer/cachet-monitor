@@ -1,6 +1,7 @@
 package cachet
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -208,14 +209,7 @@ func (mon *AbstractMonitor) AnalyseData() {
 	if currentIsUp {
 		l.Printf("monitor is up")
 	} else {
-		l.Printf("monitor down %d/%d", numDown, HistorySize)
-	}
-
-	historyMaxSize := HistorySize
-
-	// wait for stable
-	if len(mon.history) != historyMaxSize {
-		return
+		l.Printf("monitor is down")
 	}
 
 	if !currentIsUp {
@@ -236,54 +230,35 @@ func (mon *AbstractMonitor) AnalyseData() {
 			// is down, create an incident
 			l.Infof("creating incident. Monitor is down: %v", mon.lastFailReason)
 		} else {
-
 			mon.incident.Message = message
 		}
 
 		// set investigating status
 		mon.incident.SetInvestigating()
 		// create/update incident
-		if err, updatedStatus := mon.incident.Send(mon.config); err != nil {
+		if err, _ := mon.incident.Send(mon.config); err != nil {
 			l.Printf("Error sending incident: %v", err)
-		} else {
-			// clean history
-			mon.history = []bool{}
-			// operational
-			if updatedStatus == 4 {
-				mon.incident = nil
-				l.Infoln("Service fullly down.")
-			} else {
-				l.Infoln("Service availability downgrade.")
-			}
 		}
 
-		return
 	} else if mon.incident != nil && currentIsUp {
 		// was down, an incident existed
 		// its now ok, make it resolved
 
 		// resolve incident
 		tplData := getTemplateData(mon)
-		tplData["downSeconds"] = time.Since(mon.incident.incidentTime).Seconds()
+		tplData["downSeconds"] = fmt.Sprintf("%.2f", time.Since(mon.incident.incidentTime).Seconds())
 
 		subject, message := mon.Template.Fixed.Exec(tplData)
 		mon.incident.Name = subject
 		mon.incident.Message = message
 		mon.incident.SetFixed()
 
-		if err, updatedStatus := mon.incident.Send(mon.config); err != nil {
+		if err, _ := mon.incident.Send(mon.config); err != nil {
 			l.Printf("Error sending incident: %v", err)
 		} else {
 			// clean history
-			mon.history = []bool{}
 			mon.lastFailReason = ""
-			// operational
-			if updatedStatus == 1 {
-				mon.incident = nil
-				l.Infoln("Service stable running.")
-			} else {
-				l.Infoln("Service availability upgrade.")
-			}
+			mon.incident = nil
 		}
 	}
 
