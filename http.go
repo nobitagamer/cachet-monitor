@@ -41,7 +41,7 @@ type HTTPMonitor struct {
 
 func (monitor *HTTPMonitor) test() bool {
 
-	req, err := http.NewRequest(monitor.Method, monitor.Target, nil)
+	req, err := http.NewRequest(monitor.Method, fmt.Sprintf("%v://%v", monitor.Type, monitor.Target), nil)
 
 	for k, v := range monitor.Headers {
 		req.Header.Add(k, v)

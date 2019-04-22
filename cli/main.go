@@ -46,6 +46,21 @@ func main() {
 			Usage:  "Path to configuration file",
 		},
 		cli.StringFlag{
+			Name:   "server,s",
+			EnvVar: "CACHET_SERVER_API",
+			Usage:  "The server api uri, with schema & path",
+		},
+		cli.StringFlag{
+			Name:   "token,t",
+			EnvVar: "CACHET_USER_TOKEN",
+			Usage:  "The server user token",
+		},
+		cli.StringFlag{
+			Name:   "auto,a",
+			EnvVar: "AUTO_CONFIG",
+			Usage:  "Auto configuration",
+		},
+		cli.StringFlag{
 			Name:   "log,l",
 			EnvVar: "LOG_FILE",
 			Usage:  "Path to log file",
@@ -67,13 +82,31 @@ func main() {
 
 func appAction(c *cli.Context) (err error) {
 
+	autoConfig := c.GlobalBool("auto")
 	configPath := c.GlobalString("config")
 	systemName := c.GlobalString("name")
 	logFile := c.GlobalString("log")
 
-	cfg, err := getConfiguration(configPath)
-	if err != nil {
-		logrus.Panicf("Unable to start (reading config): %v", err)
+	var cfg *cachet.CachetMonitor
+
+	if autoConfig {
+		logrus.Println("Start auto configuration")
+		api := cachet.CachetAPI{
+			URL:   c.GlobalString("server"),
+			Token: c.GlobalString("token"),
+		}
+		if cfg, err = api.GetConfigurationFromRemote(); err != nil {
+			logrus.Panicf("Unable to start (fetch config): %v", err)
+		}
+	} else {
+		logrus.Println("Start file based configuration")
+		if cfg, err = getConfiguration(configPath); err != nil {
+			logrus.Panicf("Unable to start (reading config): %v", err)
+		}
+	}
+
+	if cfg, err = setupMonitors(cfg); err != nil {
+		logrus.Panicf("Unable to setup config: %v", err)
 	}
 
 	cfg.Immediate = true
@@ -83,16 +116,6 @@ func appAction(c *cli.Context) (err error) {
 	}
 
 	logrus.SetOutput(getLogger(logFile))
-
-	if len(os.Getenv("CACHET_API")) > 0 {
-		cfg.API.URL = os.Getenv("CACHET_API")
-	}
-	if len(os.Getenv("CACHET_TOKEN")) > 0 {
-		cfg.API.Token = os.Getenv("CACHET_TOKEN")
-	}
-	if len(os.Getenv("CACHET_DEV")) > 0 {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
 
 	if valid := cfg.Validate(); !valid {
 		logrus.Errorf("Invalid configuration")
@@ -151,41 +174,7 @@ func getLogger(logPath interface{}) *os.File {
 	return file
 }
 
-func getConfiguration(path string) (*cachet.CachetMonitor, error) {
-	var cfg cachet.CachetMonitor
-	var data []byte
-
-	// test if its a url
-	url, err := url.ParseRequestURI(path)
-	if err == nil && len(url.Scheme) > 0 {
-		// download config
-		response, err := http.Get(path)
-		if err != nil {
-			logrus.Warn("Unable to download network configuration")
-			return nil, err
-		}
-
-		defer response.Body.Close()
-		data, _ = ioutil.ReadAll(response.Body)
-
-		logrus.Info("Downloaded network configuration.")
-	} else {
-		data, err = ioutil.ReadFile(path)
-		if err != nil {
-			return nil, errors.New("Unable to open file: '" + path + "'")
-		}
-	}
-
-	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
-		err = yaml.Unmarshal(data, &cfg)
-	} else {
-		err = json.Unmarshal(data, &cfg)
-	}
-
-	if err != nil {
-		logrus.Warnf("Unable to parse configuration file")
-	}
-
+func setupMonitors(cfg *cachet.CachetMonitor) (*cachet.CachetMonitor, error) {
 	cfg.Monitors = make([]cachet.MonitorInterface, len(cfg.RawMonitors))
 
 	for index, rawMonitor := range cfg.RawMonitors {
@@ -199,7 +188,7 @@ func getConfiguration(path string) (*cachet.CachetMonitor, error) {
 		}
 
 		switch monType {
-		case "http":
+		case "http", "https":
 			var s cachet.HTTPMonitor
 			err = mapstructure.Decode(rawMonitor, &s)
 			t = &s
@@ -244,5 +233,43 @@ func getConfiguration(path string) (*cachet.CachetMonitor, error) {
 		cfg.Monitors[index] = t
 	}
 
-	return &cfg, err
+	return cfg, nil
+}
+
+func getConfiguration(path string) (*cachet.CachetMonitor, error) {
+	cfg := &cachet.CachetMonitor{}
+	var data []byte
+
+	// test if its a url
+	url, err := url.ParseRequestURI(path)
+	if err == nil && len(url.Scheme) > 0 {
+		// download config
+		response, err := http.Get(path)
+		if err != nil {
+			logrus.Warn("Unable to download network configuration")
+			return nil, err
+		}
+
+		defer response.Body.Close()
+		data, _ = ioutil.ReadAll(response.Body)
+
+		logrus.Info("Downloaded network configuration.")
+	} else {
+		data, err = ioutil.ReadFile(path)
+		if err != nil {
+			return nil, errors.New("Unable to open file: '" + path + "'")
+		}
+	}
+
+	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
+		err = yaml.Unmarshal(data, cfg)
+	} else {
+		err = json.Unmarshal(data, cfg)
+	}
+
+	if err != nil {
+		logrus.Warnf("Unable to parse configuration file")
+	}
+
+	return cfg, err
 }

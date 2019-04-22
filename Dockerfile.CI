@@ -7,4 +7,6 @@ COPY ./artifacts/build/cachetmonitor-linux-amd64.zip .
 
 RUN unzip ./cachetmonitor-linux-amd64.zip
 
+ENV AUTO_CONFIG true
+
 CMD ["./cachetmonitor-linux-amd64"]

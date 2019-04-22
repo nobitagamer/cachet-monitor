@@ -17,6 +17,8 @@
 - [x] **NEW** TCP Checks
 - [ ] **NEW** SAP Cloud Application Status Checks
 - [x] **NEW** Configuration schema file
+- [x] **NEW** Auto configuration from cachet server
+- [ ] **NEW** Reload configuration from cachet server
 - [x] **REFACTOR** cli
 - [x] **REFACTOR** threshold removed
 

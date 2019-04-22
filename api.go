@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/imroc/req"
+
 	"github.com/Sirupsen/logrus"
 )
 
@@ -23,7 +25,70 @@ type CachetResponse struct {
 	Data json.RawMessage `json:"data"`
 }
 
-// TODO: test
+// GetConfigurationFromRemote server
+func (api CachetAPI) GetConfigurationFromRemote() (*CachetMonitor, error) {
+	rt := &CachetMonitor{}
+	components, err := api.GetAllComponents()
+
+	if err != nil {
+		return nil, err
+	}
+	rt.API = api
+	rt.DateFormat = DefaultTimeFormat
+	rt.Immediate = true
+	monitors := []map[string]interface{}{}
+
+	for _, c := range components {
+		if !c.Enabled {
+			logrus.Printf("Component %v dieabled, skiped", c.Name)
+			continue
+		}
+
+		m := map[string]interface{}{}
+
+		m["name"] = c.Name
+		// json configuration will overwrite default name
+
+		err := json.Unmarshal([]byte(c.Description), &m)
+
+		// not a valid url, skip it
+		if err != nil {
+			logrus.Printf("Component %v without a valid description, skiped", c.Name)
+			continue
+		}
+
+		m["component_id"] = c.ID
+
+		monitors = append(monitors, m)
+
+	}
+
+	rt.RawMonitors = monitors
+
+	return rt, nil
+
+}
+
+// GetAllComponents func
+func (api CachetAPI) GetAllComponents() ([]Datum, error) {
+	res, err := req.Get(fmt.Sprintf("%v/%v", api.URL, "components?per_page=100000"), req.Header{
+		"X-Cachet-Token": api.Token,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	body := &Components{}
+
+	if err = res.ToJSON(body); err != nil {
+		return nil, err
+	}
+
+	return body.Data, nil
+}
+
+// Ping system is alive
 func (api CachetAPI) Ping() error {
 	resp, _, err := api.NewRequest("GET", "/ping", nil)
 	if err != nil {
