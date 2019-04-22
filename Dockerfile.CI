@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install -y zip
+RUN apt-get update && apt-get install -y zip curl
 
 # support lets encrypt root CA
 RUN curl https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem > /usr/local/share/ca-certificates/letencrypt.crt
