@@ -15,12 +15,14 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
+// CachetAPI struct
 type CachetAPI struct {
 	URL      string `json:"url"`
 	Token    string `json:"token"`
 	Insecure bool   `json:"insecure"`
 }
 
+// CachetResponse struct
 type CachetResponse struct {
 	Data json.RawMessage `json:"data"`
 }

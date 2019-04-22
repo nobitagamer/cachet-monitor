@@ -7,12 +7,12 @@
 
 ## Features
 
-- [x] Creates & Resolves Incidents
+- [x] Create & Resolve Incidents
 - [x] Posts monitor lag to cachet graphs
 - [x] HTTP Checks (body/status code)
 - [x] DNS Checks
-- [x] Updates Component to Partial Outage
-- [x] Updates Component to Major Outage if already in Partial Outage (works with distributed monitors)
+- [ ] **DISABLE** Updates Component to Partial Outage
+- [ ] **DISABLE** Updates Component to Major Outage if already in Partial Outage (works with distributed monitors)
 - [x] Can be run on multiple servers and geo regions
 - [x] **NEW** TCP Checks
 - [ ] **NEW** SAP Cloud Application Status Checks
