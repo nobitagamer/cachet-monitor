@@ -7,10 +7,10 @@ RUN apk update && apk upgrade && \
 
 # build
 WORKDIR /app
+# copy sources
 COPY . .
-
-RUN cd cli
-
+# setup build env
+WORKDIR /app/cli
 # vendor build only can be executed outside the GOPATH
 RUN go build -mod=vendor .
 
@@ -20,7 +20,7 @@ FROM alpine:3.9
 # add CAs
 RUN apk --no-cache add ca-certificates
 
-COPY --from=build-env /app/cli/cli ./cli
+COPY --from=build-env /app/cli/cli .
 
 # start
 CMD ["./cli", "start"]
