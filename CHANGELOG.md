@@ -2,6 +2,21 @@
 ## [Unreleased]
 
 
+<a name="v3.7.3"></a>
+## [v3.7.3] - 2019-04-29
+### Chore
+- **CI:** optimize
+- **CI:** process optimize
+- **doc:** update
+- **release:** new version
+
+### Feat
+- **vendor:** & docker image
+
+### Fix
+- **CI:** script
+
+
 <a name="v3.7.2"></a>
 ## [v3.7.2] - 2019-04-22
 ### Chore
@@ -188,7 +203,8 @@
 <a name="v1.0.0"></a>
 ## v1.0.0 - 2015-03-21
 
-[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.7.2...HEAD
+[Unreleased]: https://github.com/Soontao/cachet-monitor/compare/v3.7.3...HEAD
+[v3.7.3]: https://github.com/Soontao/cachet-monitor/compare/v3.7.2...v3.7.3
 [v3.7.2]: https://github.com/Soontao/cachet-monitor/compare/v3.7.1...v3.7.2
 [v3.7.1]: https://github.com/Soontao/cachet-monitor/compare/v3.7.0...v3.7.1
 [v3.7.0]: https://github.com/Soontao/cachet-monitor/compare/v3.6.2...v3.7.0
