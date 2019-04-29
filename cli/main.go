@@ -12,11 +12,11 @@ import (
 	"strings"
 	"sync"
 
+	cachet "github.com/Soontao/cachet-monitor"
 	"github.com/urfave/cli"
 
-	"github.com/Sirupsen/logrus"
-	cachet "github.com/Soontao/cachet-monitor"
 	"github.com/mitchellh/mapstructure"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 

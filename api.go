@@ -12,7 +12,7 @@ import (
 
 	"github.com/imroc/req"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 // CachetAPI struct

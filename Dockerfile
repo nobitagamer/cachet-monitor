@@ -1,4 +1,5 @@
-FROM golang:1.12-alpine
+# build image
+FROM golang:1.12-alpine3.9 AS build-env
 
 # install build tools
 RUN apk update && apk upgrade && \
@@ -7,9 +8,17 @@ RUN apk update && apk upgrade && \
 # build
 WORKDIR /go/src/app
 COPY . .
-RUN go get -d -v ./...
-WORKDIR /go/src/app/cli
-RUN go build 
+RUN cd cli
+RUN go build -mod=vendor
+
+# distribution image
+FROM alpine:3.9
+
+# add CAs
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /go/bin
+COPY --from=build-env /go/src/app/cli ./cli
 
 # start
-CMD ["cli", "start"]
+CMD ["./cli", "start"]
