@@ -8,8 +8,7 @@ jobs:
     working_directory: /go/src/github.com/Soontao/cachet-monitor
     steps:
       - checkout
-      - run: go get -v -t -d ./...
-      - run: go test -v ./... -race -coverprofile=coverage.txt -covermode=atomic
+      - run: go test -v -mod=vendor ./... -race -coverprofile=coverage.txt -covermode=atomic
       - run: go build .
       - run: bash <(curl -s https://codecov.io/bash)
 
@@ -22,9 +21,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/artifacts
-      - run: 
-          name: install golang deps
-          command: go get -v -t -d ./...
       - run: 
           name: build multi platform excutable file
           command: cd ./cli && VERSION=${CIRCLE_TAG} bash ./build.sh
