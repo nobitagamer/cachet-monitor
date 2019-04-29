@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: circleci/golang:1.12
 
-    working_directory: /go/src/github.com/Soontao/cachet-monitor
+    working_directory: ~/cachet-monitor
     steps:
       - checkout
       - run: go test -v -mod=vendor ./... -race -coverprofile=coverage.txt -covermode=atomic
@@ -16,7 +16,7 @@ jobs:
     docker:
       - image: circleci/golang:1.12
 
-    working_directory: /go/src/github.com/Soontao/cachet-monitor
+    working_directory: ~/cachet-monitor
     steps:
       - checkout
       - attach_workspace:
@@ -44,7 +44,7 @@ jobs:
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ~/artifacts/build/
 
   publish-docker-image:
-    working_directory: /go/src/github.com/Soontao/cachet-monitor
+    working_directory: ~/cachet-monitor
     docker:
       - image: docker:18.06.3-ce-git
     steps:
