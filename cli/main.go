@@ -12,7 +12,7 @@ import (
 	"sync"
 
 	"github.com/Sirupsen/logrus"
-	cachet "github.com/aberfeldy/cachet-monitor"
+	cachet "github.com/castawaylabs/cachet-monitor"
 	docopt "github.com/docopt/docopt-go"
 	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
@@ -59,7 +59,7 @@ func main() {
 		cfg.Immediate = immediate.(bool)
 	}
 
-	if restarted, ok := arguments["--restarted"]; ok{
+	if restarted, ok := arguments["--restarted"]; ok {
 		cfg.Restarted = restarted.(bool)
 	}
 
