@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -66,7 +67,9 @@ func main() {
 	if name := arguments["--name"]; name != nil {
 		cfg.SystemName = name.(string)
 	}
-	logrus.SetOutput(getLogger(arguments["--log"]))
+
+	mw := io.MultiWriter(os.Stdout, getLogger(arguments["--log"]))
+	logrus.SetOutput(mw)
 
 	if len(os.Getenv("CACHET_API")) > 0 {
 		cfg.API.URL = os.Getenv("CACHET_API")
